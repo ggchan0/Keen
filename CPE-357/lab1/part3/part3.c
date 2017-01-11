@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "part3.h"
 
 int sum(int arr[], int length) {

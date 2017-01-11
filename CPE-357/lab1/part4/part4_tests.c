@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "part4.h"
-#include "part4.c"
 #include "checkit.h"
 
 void test_str_lower_all_lower() {

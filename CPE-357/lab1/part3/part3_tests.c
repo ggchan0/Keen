@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "part3.h"
-#include "part3.c"
 #include "checkit.h"
 
 #define LENGTH 10

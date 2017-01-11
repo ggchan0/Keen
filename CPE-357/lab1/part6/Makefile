@@ -7,7 +7,6 @@ all : $(MAIN)
 
 $(MAIN) : $(DEPS)
 	$(CC) $(CFLAGS) part6_tests.c
-	./$(MAIN)
 
 clean :
 	rm *.o $(MAIN) core

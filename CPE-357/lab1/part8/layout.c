@@ -8,6 +8,7 @@ void function_one(int input)
 void function_two()
 {
    int function_two_local;
+   printf("%d\n", function_two_local);
 }
 
 int main(void)

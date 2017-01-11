@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "part2.c"
 #include "checkit.h"
 #include "part2.h"
 
