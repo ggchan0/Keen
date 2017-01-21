@@ -21,7 +21,7 @@ int char_in_delete_set(char c, char *delete_set) {
          i++;
          switch(delete_set[i]) {
             case '\0':
-               delete_char = (c == '\\');
+               i--;
                break;
 
             case '\\':
@@ -31,6 +31,7 @@ int char_in_delete_set(char c, char *delete_set) {
             case 'n':
                delete_char = (c == '\n');
                break;
+
             case 't':
                delete_char = (c == '\t');
                break;
