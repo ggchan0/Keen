@@ -156,8 +156,8 @@ char find_sub_char(int sub_pos, char *set) {
          i++;
          switch(set[i]) {
             case '\0':
-               final_c = '\\';
                i--;
+               final_c = '\\';
                break;
 
             case '\\':
@@ -199,17 +199,19 @@ void execute_substitute_mode(char c, char **argv) {
 }
 
 int main(int argc, char **argv) {
+   int delete_mode;
+   int c;
+   int set_length;
    if (argc != 3) {
 	   printf("Program requires only 3 arguments, %d given\n", argc);
 	   return 1;
    }
-   if (argv[1] == "" || argv[2] == "") {
+   if (strcmp(argv[1], "") == 0 || strcmp(argv[2], "") == 0) {
       printf("ERROR: One of the inputted sets is empty.\n");
       return 1;
    }
-   int delete_mode = get_mode(argc, argv);
-   int c;
-   int set_length = get_length_of_set(argv[1]);
+   delete_mode = get_mode(argc, argv);
+   set_length = get_length_of_set(argv[1]);
    printf("set_length: %d\n", set_length);
    while ((c = getchar()) != EOF) {
       if (delete_mode == 1) {
