@@ -13,33 +13,40 @@ int get_mode(int argc, char ** args) {
    return code;
 }
 
+int match_special_chars(char c, char cur_c) {
+   int delete_char = 0;
+   switch(cur_c) {
+      case '\0':
+         delete_char = (c == '\\');
+         break;
+
+      case '\\':
+         delete_char = (c == '\\');
+         break;
+
+      case 'n':
+         delete_char = (c == '\n');
+         break;
+
+      case 't':
+         delete_char = (c == '\t');
+         break;
+
+      default:
+         delete_char = (c == cur_c);
+         break;
+   }
+   return delete_char;
+}
+
 int char_in_delete_set(char c, char *delete_set) {
    int i = 0;
    int delete_char = 0;
    while (delete_set[i] != '\0') {
       if (delete_set[i] == '\\') {
-         i++;
-         switch(delete_set[i]) {
-            case '\0':
-               i--;
-               delete_char = (c == '\\');
-               break;
-
-            case '\\':
-               delete_char = (c == '\\');
-               break;
-
-            case 'n':
-               delete_char = (c == '\n');
-               break;
-
-            case 't':
-               delete_char = (c == '\t');
-               break;
-
-            default:
-               delete_char = (c == delete_set[i]);
-               break;
+         delete_char = match_special_chars(c, delete_set[++i]);
+         if (delete_set[i] == '\0') {
+            i--;
          }
       } else {
          delete_char = (c == delete_set[i]);
@@ -68,42 +75,6 @@ void execute_delete_mode(char c, char *delete_set) {
    }
 }
 
-int get_length_of_set(char *set) {
-   int count = 0;
-   int i = 0;
-   while (set[i] != '\0') {
-      if (set[i] == '\\') {
-         i++;
-         switch(set[i]) {
-            case '\0':
-               i--;
-               count++;
-               break;
-
-            case '\\':
-               count++;
-               break;
-
-            case 'n':
-               count++;
-               break;
-
-            case 't':
-               count++;
-               break;
-
-            default:
-               count++;
-               break;
-         }
-      } else {
-         count++;
-      }
-      i++;
-   }
-   return count;
-}
-
 int find_sub_position(char c, char *set) {
    int pos = 1;
    int final_pos = -1;
@@ -111,28 +82,9 @@ int find_sub_position(char c, char *set) {
    int sub_char = 0;
    while (set[i] != '\0') {
       if (set[i] == '\\') {
-         i++;
-         switch(set[i]) {
-            case '\0':
-               i--;
-               sub_char = (c == '\\');
-               break;
-
-            case '\\':
-               sub_char = (c == '\\');
-               break;
-
-            case 'n':
-               sub_char = (c == '\n');
-               break;
-
-            case 't':
-               sub_char = (c == '\t');
-               break;
-
-            default:
-               sub_char = (c == set[i]);
-               break;
+         sub_char = match_special_chars(c, set[++i]);
+         if (set[i] == '\0') {
+            i--;
          }
       } else {
          sub_char = (c == set[i]);
@@ -201,7 +153,6 @@ void execute_substitute_mode(char c, char **argv) {
 int main(int argc, char **argv) {
    int delete_mode;
    int c;
-   int set_length;
    if (argc != 3) {
 	   printf("Program requires only 3 arguments, %d given\n", argc);
 	   return 1;
@@ -211,8 +162,6 @@ int main(int argc, char **argv) {
       return 1;
    }
    delete_mode = get_mode(argc, argv);
-   set_length = get_length_of_set(argv[1]);
-   printf("set_length: %d\n", set_length);
    while ((c = getchar()) != EOF) {
       if (delete_mode == 1) {
          char *delete_set = get_delete_set(argv);
