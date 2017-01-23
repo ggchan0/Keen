@@ -2,15 +2,8 @@
 #include <string.h>
 
 int get_mode(int argc, char ** args) {
-   int i;
-   int code = 0;
-   for (i = 0; i < argc; i++) {
-      char *arg = *(args + i);
-      if (strcmp(arg, "-d") == 0) {
-        code = 1;
-      }
-   }
-   return code;
+   int delete_mode = strcmp(args[1], "-d") == 0;
+   return delete_mode;
 }
 
 int match_special_chars(char c, char cur_c) {
@@ -57,16 +50,6 @@ int char_in_delete_set(char c, char *delete_set) {
       i++;
    }
    return delete_char;
-}
-
-char *get_delete_set(char ** argv) {
-   char *delete_set;
-   if (strcmp(argv[1], "-d") == 0) {
-      delete_set = argv[2];
-   } else {
-      delete_set = argv[1];
-   }
-   return delete_set;
 }
 
 void execute_delete_mode(char c, char *delete_set) {
@@ -154,18 +137,17 @@ int main(int argc, char **argv) {
    int delete_mode;
    int c;
    if (argc != 3) {
-	   printf("Program requires only 3 arguments, %d given\n", argc);
+	   fprintf(stderr, "ERROR: Program requires only 3 arguments, %d given\n", argc);
 	   return 1;
    }
    if (strcmp(argv[1], "") == 0 || strcmp(argv[2], "") == 0) {
-      printf("ERROR: One of the inputted sets is empty.\n");
+      fprintf(stderr, "ERROR: One of the inputted sets is empty.\n");
       return 1;
    }
    delete_mode = get_mode(argc, argv);
    while ((c = getchar()) != EOF) {
       if (delete_mode == 1) {
-         char *delete_set = get_delete_set(argv);
-         execute_delete_mode(c, delete_set);
+         execute_delete_mode(c, argv[2]);
       } else {
          execute_substitute_mode(c, argv);
       }
