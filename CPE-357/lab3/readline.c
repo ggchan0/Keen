@@ -12,19 +12,21 @@ char * doubleSize(char *str, int length) {
 }
 
 char *readline(FILE *file) {
-   int length = 80;
+   int length = 40;
    int index = 0;
    char *str = malloc(sizeof(char) * length);
    int c;
    while ((c = fgetc(file)) != EOF && c != '\n') {
       str[index++] = c;
-      if (index == length) {
+      if (index == length - 1) {
          length *= 2;
          str = doubleSize(str, length);
       }
    }
    if (c == EOF) {
       str = NULL;
+   } else {
+      str[index] = '\0';
    }
    return str;
 }
