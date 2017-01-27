@@ -12,18 +12,19 @@ char * doubleSize(char *str, int length) {
 }
 
 char *readline(FILE *file) {
-   int length = 40;
+   int length = 10;
    int index = 0;
    char *str = malloc(sizeof(char) * length);
    int c;
    while ((c = fgetc(file)) != EOF && c != '\n') {
       str[index++] = c;
-      if (index == length - 1) {
+      if (index == (length - 1)) {
          length *= 2;
          str = doubleSize(str, length);
       }
    }
    if (c == EOF) {
+      free(str);
       str = NULL;
    } else {
       str[index] = '\0';
@@ -32,7 +33,7 @@ char *readline(FILE *file) {
 }
 
 int main(void) {
-   FILE *f = fopen("test.txt", "r");
+   FILE *f = fopen("test2.txt", "r");
    if (f == NULL) {
       printf("Error opening file\n");
       return 1;
