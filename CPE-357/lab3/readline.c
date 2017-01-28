@@ -2,13 +2,7 @@
 #include <stdlib.h>
 
 char * doubleSize(char *str, int length) {
-   char *new_str = malloc(sizeof(char) * length * 2);
-   int i;
-   for (i = 0; i < length; i++) {
-      new_str[i] = str[i];
-   }
-   free(str);
-   return new_str;
+   return realloc(str, length);
 }
 
 char *readline(FILE *file) {
@@ -23,17 +17,16 @@ char *readline(FILE *file) {
          str = doubleSize(str, length);
       }
    }
+   str[index] = '\0';
    if (c == EOF) {
       free(str);
       str = NULL;
-   } else {
-      str[index] = '\0';
    }
    return str;
 }
 
 int main(void) {
-   FILE *f = fopen("test2.txt", "r");
+   FILE *f = fopen("test.txt", "r");
    if (f == NULL) {
       printf("Error opening file\n");
       return 1;
