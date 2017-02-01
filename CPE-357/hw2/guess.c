@@ -7,46 +7,6 @@
 #define LEFT 0
 #define RIGHT 1
 
-char *pickArticle(char *str) {
-   char *article = malloc(sizeof(char) * 3);
-   switch(str[0]) {
-      case 'A':
-         article = "an\0";
-         break;
-      case 'a':
-         article = "an\0";
-         break;
-      case 'E':
-         article = "an\0";
-         break;
-      case 'e':
-         article = "an\0";
-         break;
-      case 'I':
-         article = "an\0";
-         break;
-      case 'i':
-         article = "an\0";
-         break;
-      case 'O':
-         article = "an\0";
-         break;
-      case 'o':
-         article = "an\0";
-         break;
-      case 'U':
-         article = "an\0";
-         break;
-      case 'u':
-         article = "an\0";
-         break;
-      default:
-         article = "a\0";
-         break;
-   }
-   return article;
-}
-
 char *initializeAnswer() {
    char *input;
    do {
@@ -58,38 +18,30 @@ char *initializeAnswer() {
 
 char *confirmAnswer(char *answer) {
    char *input;
-   char *article = pickArticle(answer);
    do {
-      printf("Is it %s %s? ", article, answer);
+      printf("Is it %s? ", answer);
       input = readline(stdin);
    } while (!input || isEmptyInput(input));
-   free(article);
    return input;
 }
 
 char *promptForQuestion(char *answer_1, char *answer_2) {
    char *input;
-   char *article_1 = pickArticle(answer_1);
-   char *article_2 = pickArticle(answer_2);
    do {
-      printf("What is a yes/no question"
-             "that will distinguish %s %s from %s %s? ",
-             article_1, answer_1, article_2, answer_2);
+      printf("What is a yes/no question "
+             "that will distinguish %s from %s? ",
+             answer_1, answer_2);
       input = readline(stdin);
    } while (!input || isEmptyInput(input));
-   free(article_1);
-   free(article_2);
    return input;
 }
 
 char *getAnswerToQuestion(char *answer) {
    char *input;
-   char *article = pickArticle(answer);
    do {
-      printf("What is the answer to the question for %s %s? ", article, answer);
+      printf("What is the answer to the question for %s? ", answer);
       input = readline(stdin);
    } while (!input || isEmptyInput(input));
-   free(article);
    return input;
 }
 
@@ -123,6 +75,7 @@ void handleExistingDB() {
 
       }
       y_n_answer = confirmAnswer(temp->data);
+      printf("%s\n", y_n_answer);
       if (isYes(y_n_answer)) {
          printf("My, am I clever. :)\nThanks for playing!\n");
       } else {
