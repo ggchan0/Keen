@@ -32,3 +32,51 @@ int isYes(char *str) {
 int isEmptyInput(char *str) {
    return str[0] == '\0';
 }
+
+
+char *initializeAnswer() {
+   char *input;
+   do {
+      printf("What is it (with article)? ");
+      input = readline(stdin);
+   } while (!input || isEmptyInput(input));
+   return input;
+}
+
+char *confirmAnswer(char *answer) {
+   char *input;
+   do {
+      printf("Is it %s? ", answer);
+      input = readline(stdin);
+   } while (!input || isEmptyInput(input));
+   return input;
+}
+
+char *promptForNewQuestion(char *answer_1, char *answer_2) {
+   char *input;
+   do {
+      printf("What is a yes/no question "
+             "that will distinguish %s from %s? ",
+             answer_1, answer_2);
+      input = readline(stdin);
+   } while (!input || isEmptyInput(input));
+   return input;
+}
+
+char *getAnswerToNewQuestion(char *answer) {
+   char *input;
+   do {
+      printf("What is the answer to the question for %s? ", answer);
+      input = readline(stdin);
+   } while (!input || isEmptyInput(input));
+   return input;
+}
+
+char *getAnswerToQuestion(char *question) {
+   char *input;
+   do {
+      printf("%s ", question);
+      input = readline(stdin);
+   } while (!input || isEmptyInput(input));
+   return input;
+}

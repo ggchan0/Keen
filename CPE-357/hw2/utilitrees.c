@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "text_utils.h"
 
 #define LEFT 0
@@ -11,18 +12,16 @@ typedef struct Treenode {
    struct Treenode *right;
 } Treenode;
 
-Treenode *checkedTreenodeMalloc() {
-   Treenode *p = (Treenode *) malloc(sizeof(Treenode));
-   if (p == NULL) {
-      fprintf(stderr, "Error trying to malloc for a treenode\n");
-      exit(EXIT_FAILURE);
-   }
-   return p;
-}
-
 Treenode *initializeNode(char *data) {
-   Treenode *node = checkedTreenodeMalloc();
-   node->data = data;
+   Treenode *node = (Treenode *) calloc(1, sizeof(Treenode));
+   if (node == NULL) {
+      fprintf(stderr, "Error tring to malloc for a treenode\n");
+      exit(EXIT_FAILURE);
+   } else {
+      node->data = data;
+      node->left = NULL;
+      node->right = NULL;
+   }
    return node;
 }
 
@@ -54,6 +53,8 @@ void preorder(Treenode *tree) {
       printf("%s\n", tree->data);
       preorder(tree->left);
       preorder(tree->right);
+   } else {
+      printf("NULL\n");
    }
 }
 
