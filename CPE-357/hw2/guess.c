@@ -1,58 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "text_utils.h"
+#include "utilitrees.h"
 
 #define LEFT 0
 #define RIGHT 1
 
-
-char * doubleSize(char *str, int length) {
-   return realloc(str, length);
+char *promptAnswer() {
+   char *ans;
+   do {
+      printf("What is it (with article)?\n");
+      ans = readline(stdin);
+   } while (!ans || isEmptyInput(ans));
+   return ans;
 }
 
-char *readline(FILE *file) {
-   int length = 10;
-   int index = 0;
-   char *str = malloc(sizeof(char) * length);
-   int c;
-   while ((c = fgetc(file)) != EOF && c != '\n') {
-      str[index++] = c;
-      if (index == (length - 1)) {
-         length *= 2;
-         str = doubleSize(str, length);
-      }
-   }
-   str[index] = '\0';
-   if (c == EOF) {
-      free(str);
-      str = NULL;
-   }
-   return str;
-}
-
-int isYes(char *str) {
-   if (str[0] == 'y' || str[0] == 'Y') {
+int dbExists() {
+   FILE *file = fopen("qa.db", "r");
+   if (file) {
+      fclose(file);
       return 1;
    } else {
       return 0;
    }
 }
 
+void handleExistingDB() {
+   FILE *file = fopen("qa.db", "r");
+   Treenode *root = readRootFromFile(file);
+   preorder(root);
+   freeTree(root);
+}
+
+void handleEmptyDB() {
+   char *ans;
+   Treenode *root;
+   FILE *file;
+   printf("qa.db: No such file or directory\n");
+   printf("Unable to read database qa.db. Starting fresh.\n");
+   ans = promptAnswer();
+   root = checkedTreenodeMalloc();
+   root->data = ans;
+   file = fopen("qa.db", "w");
+   writeToFile(root, file);
+   freeTree(root);
+}
+
 int main(void) {
-   while (1) {
-      char *str = readline(stdin);
-      if (str == NULL) {
-         free(str);
-         break;
-      } else {
-         if (str[0] == '\0') {
-            printf("Empty string\n");
-         } else if  (isYes(str)) {
-            printf("Yes\n");
-         } else {
-            printf("No\n");
-         }
-         free(str);
-      }
+   if (dbExists()) {
+      handleExistingDB();
+   } else {
+      handleEmptyDB();
    }
+   return 0;
 }
