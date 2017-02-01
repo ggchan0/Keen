@@ -5,19 +5,25 @@
 #define LEFT 0
 #define RIGHT 1
 
-typedef struct Treenode{
+typedef struct Treenode {
    char *data;
    struct Treenode *left;
    struct Treenode *right;
 } Treenode;
 
 Treenode *checkedTreenodeMalloc() {
-   void *p = malloc(sizeof(Treenode));
+   Treenode *p = (Treenode *) malloc(sizeof(Treenode));
    if (p == NULL) {
       fprintf(stderr, "Error trying to malloc for a treenode\n");
       exit(EXIT_FAILURE);
    }
    return p;
+}
+
+Treenode *initializeNode(char *data) {
+   Treenode *node = checkedTreenodeMalloc();
+   node->data = data;
+   return node;
 }
 
 void writeToFile(Treenode *tree, FILE *file) {
@@ -34,8 +40,7 @@ Treenode *readRootFromFile(FILE *file) {
    char *str = readline(file);
    Treenode *tree = NULL;
    if (str != NULL && !isEmptyInput(str)) {
-      tree = checkedTreenodeMalloc();
-      tree->data = str;
+      tree = initializeNode(str);
       tree->left = readRootFromFile(file);
       tree->right = readRootFromFile(file);
    } else {
@@ -61,16 +66,20 @@ void freeTree(Treenode *tree) {
    }
 }
 
-int isBadTree(Treenode *tree) {
+int isGoodTree(Treenode *tree) {
    if (tree != NULL) {
-      int is_full_tree = tree->left == NULL && tree->right == NULL;
-      int is_leaf = tree->left != NULL && tree->right != NULL;
-      if (is_full_tree && is_leaf) {
-         return isBadTree(tree->left) && isBadTree(tree->right);
+      int is_full_tree = tree->left != NULL && tree->right != NULL;
+      int is_leaf = tree->left == NULL && tree->right == NULL;
+      if (is_full_tree || is_leaf) {
+         return isGoodTree(tree->left) && isGoodTree(tree->right);
       } else {
          return 0;
       }
    } else {
       return 1;
    }
+}
+
+int hasNoChildren(Treenode *tree) {
+   return tree->left == NULL && tree->right == NULL;
 }
