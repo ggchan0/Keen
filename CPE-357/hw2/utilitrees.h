@@ -1,7 +1,7 @@
 #ifndef UTILITREES
 #define UTILITREES
 
-typedef struct {
+typedef struct Treenode {
    char *data;
    struct Treenode *left;
    struct Treenode *right;
