@@ -8,7 +8,7 @@
 */
 
 int main(void) {
-   char *ptr = malloc(sizeof(char) * KILO * KILO);
+   char *ptr = malloc(KILO * KILO * 10);
    if (ptr == NULL) {
       printf("Malloc unsuccessful\n");
    } else {

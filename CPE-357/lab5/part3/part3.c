@@ -3,6 +3,7 @@
 #include <limits.h>
 
 /*
+
    local: 
    _SC_CHILD_MAX: 4096
    _SC_OPEN_MAX: 1024
