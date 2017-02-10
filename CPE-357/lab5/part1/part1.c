@@ -1,36 +1,30 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <time.h>
 
 #define buf_size 2048
 /*
-   1 1.237379
-   2 0.626163
-   16 0.087342
-   32 0.045484
-   64 0.055523
-   128 0.011084
-   256 0.011234
-   512 0.003130
-   1024 0.004555
-   2048 0.003574
+   1 17.227
+   2 8.598
+   16 1.130
+   32 0.651
+   64 0.350
+   128 0.201
+   256 0.146
+   512 0.087
+   1024 0.037
+   2048 0.026
 */
 
 
 int main(void) {
    char *file_name = "/usr/lib/locale/locale-archive";
+   /*char *file_name = "/home/ggchan/Keen/test.c";*/
    int file_desc = open(file_name, O_RDONLY);
    char buf[buf_size];
-   clock_t start, end;
-   double time_taken;
-   start = clock();
    while (read(file_desc, buf, buf_size) > 0) {
       /*printf("%s", buf);*/
    }
-   end = clock();
-   time_taken = ((double) (end - start)) / CLOCKS_PER_SEC;
-   printf("Fd %d Size %d", file_desc, buf_size);
-   printf("\nIt took %f\n", time_taken);
+   printf("\nFd %d Size %d\n", file_desc, buf_size);
    return 0;
 }
