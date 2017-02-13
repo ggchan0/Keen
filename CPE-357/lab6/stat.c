@@ -3,15 +3,47 @@
 #include <sys/stat.h>
 /*#include <sys/types.h>*/
 
+char getUserExecuteBit(struct stat buf) {
+   if ((buf.st_mode & S_ISUID)) {
+      if ((buf.st_mode & S_IXUSR)) {
+         return 's';
+      } else {
+         return 'S';
+      }
+   }
+   if ((buf.st_mode & S_IXUSR)) {
+      return 'x';
+   } else {
+      return '-';
+   }   
+}
+
+char getGroupExecuteBit(struct stat buf) {
+   if ((buf.st_mode & S_ISUID)) {
+      if ((buf.st_mode & S_IXGRP)) {
+         return 's';
+      } else {
+         return 'S';
+      }
+   }
+   if ((buf.st_mode & S_IXGRP)) {
+      return 'x';
+   } else {
+      return '-';
+   }   
+}
+
 void printPermissions(struct stat buf, char c) {
    printf("Access: ");
    printf("%c", c);
    printf((buf.st_mode & S_IRUSR) ? "r" : "-");
    printf((buf.st_mode & S_IWUSR) ? "w" : "-");
-   printf((buf.st_mode & S_IXUSR) ? "x" : "-");
+   /*printf((buf.st_mode & S_IXUSR) ? "x" : "-");*/
+   printf("%c", getUserExecuteBit(buf));
    printf((buf.st_mode & S_IRGRP) ? "r" : "-");
    printf((buf.st_mode & S_IWGRP) ? "w" : "-");
-   printf((buf.st_mode & S_IXGRP) ? "x" : "-");
+   /*printf((buf.st_mode & S_IXGRP) ? "x" : "-");*/
+   printf("%c", getGroupExecuteBit(buf));
    printf((buf.st_mode & S_IROTH) ? "r" : "-");
    printf((buf.st_mode & S_IWOTH) ? "w" : "-");
    printf((buf.st_mode & S_IXOTH) ? "x" : "-");
