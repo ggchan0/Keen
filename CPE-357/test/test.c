@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
 
 char *trimwhitespace(char *str) {
    char *end;
@@ -19,14 +22,11 @@ char *trimwhitespace(char *str) {
 }
 
 int main(void) {
-	char first[] = " hello : why hi there ";
-	char *token;
-	char *delim = ":";
-	token = strtok(first, delim);
-	while (token != NULL) {
-		token = trimwhitespace(token);
-		printf("%s %d\n", token, (int) strlen(token));
-		token = strtok(NULL, delim);
-	}
+    struct stat buf1;
+    struct stat buf2;
+    stat("./old.txt", &buf1);
+    stat("./new.txt", &buf2);
+    printf("%s\n", ctime(&buf1.st_mtime));
+    printf("%s\n", ctime(&buf2.st_mtime));
 	return 0;
 }

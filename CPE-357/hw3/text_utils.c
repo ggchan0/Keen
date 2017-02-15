@@ -70,7 +70,7 @@ int isValidRule(char *line) {
    int colon_count = 0;
    int index = 0;
    while (*(line + index) != '\0') {
-      if (*(line + index) == ':') {
+      if (*(line + index++) == ':') {
          colon_count++;
       }
    }

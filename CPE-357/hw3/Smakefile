@@ -1,2 +1,2 @@
-hello there
-hi
+echo:
+	echo "hello"

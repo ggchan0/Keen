@@ -15,7 +15,7 @@ char getUserExecuteBit(struct stat buf) {
       return 'x';
    } else {
       return '-';
-   }   
+   }
 }
 
 char getGroupExecuteBit(struct stat buf) {

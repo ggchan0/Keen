@@ -48,6 +48,36 @@ void addToRulelist(Rulelist *rulelist, RuleNode *ruleNode) {
    }
 }
 
+void printNodelist(Nodelist *list) {
+   if (list != NULL) {
+      CharNode *cur = list->head;
+      printf("Printing char list\n");
+      while (cur != NULL) {
+         printf("%s\n", cur->data);
+         cur = cur->next;
+      }
+   }
+}
+
+void printRuleNode(RuleNode *rule) {
+   printf("Printing rule for %s\n", rule->name);
+   printNodelist(rule->dependencies);
+   printNodelist(rule->commands);
+}
+
+void printRulelist(Rulelist *list) {
+   RuleNode* cur = list->head;
+   printf("Printing rule list\n");
+   while (cur != NULL) {
+      printRuleNode(cur);
+      cur = cur->next;
+   }
+}
+
+int noTarget(RuleNode *node) {
+   return node->name == NULL;
+}
+
 CharNode *initializeCharNode(char *data) {
    CharNode *node = malloc(sizeof(CharNode));
    if (node == NULL) {
@@ -137,7 +167,9 @@ void freeRulelist(Rulelist *list) {
       while (head != NULL) {
          RuleNode *temp = head;
          head = head->next;
+         freeNodelist(temp->dependencies);
          free(temp->dependencies);
+         freeNodelist(temp->commands);
          free(temp->commands);
          free(temp);
       }
