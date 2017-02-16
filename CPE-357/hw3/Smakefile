@@ -1,2 +1,2 @@
-echo:
-	echo "hello"
+Smake : text_utils.c shake_and_smake.c smake_structures.c
+	gcc -ansi -pedantic -Wall shake_and_smake.c -o Smake
