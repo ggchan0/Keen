@@ -176,11 +176,12 @@ void freeRulelist(Rulelist *list) {
    }
 }
 
-void freeAllData(Rulelist *rulelist, Nodelist *m_list, Nodelist *c_list) {
+void freeAllData(Rulelist *rulelist, Nodelist *master_list, 
+                  Nodelist *copied_list) {
    freeRulelist(rulelist);
    free(rulelist);
-   freeNodelistAndData(m_list);
-   free(m_list);
-   freeNodelist(c_list);
-   free(c_list);
+   freeNodelistAndData(master_list);
+   free(master_list);
+   freeNodelist(copied_list);
+   free(copied_list);
 }
