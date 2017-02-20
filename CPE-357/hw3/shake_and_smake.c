@@ -161,6 +161,10 @@ void applyRules(Rulelist *rules, char *rule_name) {
       exit(EXIT_FAILURE);
    } else if (rule_name != NULL) {
       RuleNode *rule = getTarget(rules, rule_name);
+      if (rule == NULL) {
+         fprintf(stderr, "Rule doesn't exist, quitting\n");
+         exit(EXIT_FAILURE);
+      }
       processRule(rules, rule);
    } else {
       processRule(rules, rules->head);
