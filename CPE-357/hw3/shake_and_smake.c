@@ -60,7 +60,7 @@ Rulelist *getRules(Nodelist *lines) {
    RuleNode *rule = NULL;
    Nodelist *commands = NULL;
    CharNode *cur = lines->head;
-   while (cur != NULL) {  
+   while (cur != NULL) {
       int isACommand = isCommand(cur->data);
       char *trimmed_line = trimwhitespace(cur->data);
       if (isEmpty(trimmed_line) == 0) {
@@ -161,6 +161,10 @@ void applyRules(Rulelist *rules, char *rule_name) {
       exit(EXIT_FAILURE);
    } else if (rule_name != NULL) {
       RuleNode *rule = getTarget(rules, rule_name);
+      if (rule == NULL) {
+         fprintf(stderr, "Rule doesn't exist, quitting\n");
+         exit(EXIT_FAILURE);
+      }
       processRule(rules, rule);
    } else {
       processRule(rules, rules->head);
