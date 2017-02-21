@@ -60,7 +60,7 @@ Rulelist *getRules(Nodelist *lines) {
    RuleNode *rule = NULL;
    Nodelist *commands = NULL;
    CharNode *cur = lines->head;
-   while (cur != NULL) {  
+   while (cur != NULL) {
       int isACommand = isCommand(cur->data);
       char *trimmed_line = trimwhitespace(cur->data);
       if (isEmpty(trimmed_line) == 0) {
