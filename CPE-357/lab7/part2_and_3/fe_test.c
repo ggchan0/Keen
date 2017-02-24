@@ -28,7 +28,6 @@ int main(int argc, char ** argv) {
       exit(EXIT_FAILURE);
    } else {
       if (pid1 == 0) {
-         printf("pid 1\n");
          if (print_evens == 0) {
             execvp("./print_evens", args);
             perror("Failed\n");
@@ -44,7 +43,6 @@ int main(int argc, char ** argv) {
       exit(EXIT_FAILURE);
    } else {
       if (pid2 == 0) {
-         printf("pid 2\n");
          if (print_evens == 0) {
             execvp("./print_evens", args);
             perror("Failed\n");

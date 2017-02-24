@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/stat.h>
 
 int main(int argc, char **argv) {
    char *file_name[1];
@@ -16,9 +17,10 @@ int main(int argc, char **argv) {
    file_name[0] = argv[2];
    args[0] = argv[2];
    args[1] = NULL;
+   buf[0] = '\0';
    strcat(buf, "./");
    strcat(buf, argv[1]);
-   fd = open(file_name[0], O_WRONLY | O_CREAT | O_TRUNC);
+   fd = open(file_name[0], O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IXUSR);
    dup2(fd, 1);
    execvp(buf, args);
    return 0;

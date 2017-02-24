@@ -1,3 +1,5 @@
+all : print_evens print_odds fe_test
+
 print_evens : print_evens.c
 	gcc -Wall -pedantic -ansi print_evens.c -o print_evens
 
