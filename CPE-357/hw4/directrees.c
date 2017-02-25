@@ -34,7 +34,6 @@ void printDirs(char *dir, int level, int print_hidden, int print_perms) {
    if (getcwd(cwd, sizeof(cwd)) == NULL) {
       fprintf(stderr, "Cannot get current working directory\n");
    }
-   strcat(cwd, "/");
    if (n < 0) {
       perror("scandir");
    } else {
@@ -55,6 +54,26 @@ void printDirs(char *dir, int level, int print_hidden, int print_perms) {
                      printf("%s\n", entry);
                   }
                } else {
+                  if (!isHidden(entry) || print_hidden) {
+                     printIndent(level);
+                     printf("-- ");
+                     if (print_perms) {
+                        printPermissions(buf, type);
+                        printf(" ");
+                     }
+                     printf("--%s\n", entry);
+                     if (!checkedChdir(entry)) {
+                        printf("Cannot change into directory %s\n", entry);
+                     } else {
+                        char new_cwd[1024];
+                        if (getcwd(new_cwd, sizeof(new_cwd)) == NULL) {
+                           printf("Cannot get current working directory\n");
+                        }
+                        printDirs(new_cwd, level + 1, print_hidden, print_perms);
+                        checkedChdir(cwd);
+                     }
+                  }
+                  /*
                   if (isHidden(namelist[i]->d_name) && print_hidden) {
                      printIndent(level);
                      if (print_perms) {
@@ -94,6 +113,7 @@ void printDirs(char *dir, int level, int print_hidden, int print_perms) {
                         }
                      }
                   }
+                  */
                }
             }
          }
@@ -173,7 +193,6 @@ int main(int argc, char **argv) {
    if (getcwd(cwd, sizeof(cwd)) == NULL) {
       fprintf(stderr, "Cannot get current working directory\n");
    }
-   strcat(cwd, "/");
    for (i = 1; i < argc; i++) {
       if (isFlag(argv[i]) && file_hit == 0) {
          print_hidden = print_hidden | checkHidden(argv[i]);
