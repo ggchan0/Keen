@@ -1,5 +1,8 @@
-tree : directrees.c
-	gcc -std=gnu99 -pedantic -Wall directrees.c -o tree
+all : utilitrees.o directrees.o
+	gcc -std=gnu99 -pedantic -Wall utilitrees.o directrees.o -o tree
 
-all : utilitrees.c directrees.c
-	gcc -std=gnu99 -pedantic -Wall utilitrees.c directrees.c -o tree
+directrees.o : directrees.c
+	gcc -std=gnu99 -pedantic -Wall directrees.c -c
+
+utilitrees.o : utilitrees.h utilitrees.c
+	gcc -std=gnu99 -pedantic -Wall utilitrees.c -c

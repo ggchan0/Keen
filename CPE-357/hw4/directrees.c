@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "utilitrees.c"
+#include "utilitrees.h"
 #include <sys/dir.h>
 
 int checkedChdir(char *dir) {
@@ -41,7 +41,7 @@ void printDirs(char *dir, int level, int print_hidden, int print_perms) {
          char *entry = namelist[i]->d_name;
          if (!isSpecial(entry)) {
             if (stat(entry, &buf) == -1) {
-               printf("Could not read file %s", namelist[i]->d_name);
+               printf("Could not read file %s", entry);
             } else {
                if ((type = getFileTypeChar(buf)) != 'd') {
                   if (!isHidden(entry) || print_hidden) {
@@ -61,10 +61,8 @@ void printDirs(char *dir, int level, int print_hidden, int print_perms) {
                         printPermissions(buf, type);
                         printf(" ");
                      }
-                     printf("--%s\n", entry);
-                     if (!checkedChdir(entry)) {
-                        printf("Cannot change into directory %s\n", entry);
-                     } else {
+                     printf("%s\n", entry);
+                     if (checkedChdir(entry)) {
                         char new_cwd[1024];
                         if (getcwd(new_cwd, sizeof(new_cwd)) == NULL) {
                            printf("Cannot get current working directory\n");
@@ -85,8 +83,9 @@ void printDirs(char *dir, int level, int print_hidden, int print_perms) {
 void executePrintDirs(char *dir, struct stat buf, char type, int print_hidden, int print_perms) {
    if (print_perms) {
       printPermissions(buf, type);
+      printf(" ");
    }
-   printf(" %s\n", dir);
+   printf("%s\n", dir);
    printDirs(".", 0, print_hidden, print_perms);
 }
 
@@ -112,21 +111,16 @@ int main(int argc, char **argv) {
          if ((type = getFileTypeChar(buf)) != 'd') {
             if (print_perms) {
                printPermissions(buf, type);
+               printf(" ");
             }
             printf("%s\n", argv[i]);
          } else {
-            /*
-            if (!isAbsolutePath(argv[i])) {
-               checkedChdir(cwd);
-            }
-            if (!checkedChdir(argv[i])) {
-               continue;
-            }*/
             if (!checkedChdir(argv[i])) {
                continue;
             }
             executePrintDirs(argv[i], buf, type, print_hidden, print_perms);
             checkedChdir(cwd);
+            printf("\n");
          }
       }
    }
