@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
          printf("%s does not exist\n", cwd);
       } else {
          type = getFileTypeChar(buf);
-         executePrintDirs(cwd, buf, type, print_hidden, print_perms);
+         executePrintDirs(".", buf, type, print_hidden, print_perms);
       }
    }
    return 0;

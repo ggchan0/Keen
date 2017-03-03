@@ -136,6 +136,7 @@ void processRule(Rulelist *rules, RuleNode *rule) {
          RuleNode *recursive_rule = getTarget(rules, dependency->data);
          if (recursive_rule != NULL) {
             processRule(rules, recursive_rule);
+            execute_rule = 1;
          }
          if (fileExists(dependency->data)) {
             if (isNewer(rule->name, dependency->data)) {
