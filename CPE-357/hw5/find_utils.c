@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <string.h>
 
 typedef struct Node {
    char *data;
@@ -19,7 +21,7 @@ Node *initializeNode(char *data) {
       perror("");
       exit(-1);
    } else {
-      node->data = data;
+      node->data = strdup(data);
       node->next = NULL;
    }
    return node;
@@ -41,13 +43,13 @@ void freeList(List *l) {
    while (temp != NULL) {
       Node *n = temp;
       temp = temp->next;
+      free(n->data);
       free(n);
    }
    free(l);
 }
 
-void insert(List *l, Node *n)
-{
+void insert(List *l, Node *n) {
    Node *temp;
    Node *previous;
    if (l->head == NULL)
@@ -97,7 +99,7 @@ int parseArgs(int *will_print, int *will_exec, int *will_name,
          *will_exec = i;
       } else if (strcmp("-name", argv[i]) == 0) {
          *will_name = i++;
-         name = argv[i];
+         strcpy(name, argv[i]);
       } else if (*will_exec && strcmp("{}", argv[i]) == 0) {
          *substitute = 1;
       } else if (*will_exec && strcmp(";", argv[i]) == 0) {
