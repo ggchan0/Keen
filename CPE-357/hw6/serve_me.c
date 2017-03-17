@@ -26,7 +26,7 @@ void throw403Error(int fd);
 void throw404Error(int fd);
 void throw500Error(int fd);
 void throw501Error(int fd);
-void buildPath(char *buf, char *path);
+void buildPath(int fd, char *buf, char *path);
 void executeCGI(int fd, char *method, char *path);
 void executeGet(int fd, char *method, char *path);
 void handleRequest(int fd);
@@ -141,14 +141,15 @@ void throw501Error(int fd) {
    exit(-1);
 }
 
-void buildPath(char *buf, char *path) {
+void buildPath(int fd, char *buf, char *path) {
    char *delim = "/";
    char *token = strtok(path, delim);
    while (token != NULL) {
-      if (!(strcmp(token, "..") == 0)) {
-         strcat(buf, token);
-         strcat(buf, "/");
+      if (strcmp(token, "..") == 0 || strcmp(token, "~") == 0) {
+         throw403Error(fd);
       }
+      strcat(buf, token);
+      strcat(buf, "/");
       token = strtok(NULL, delim);
    }
    buf[strlen(buf) - 1] = 0;
@@ -164,7 +165,7 @@ void executeGet(int fd, char *method, char *path) {
    int file_fd;
    int bytes_read;
    buf[0] = 0;
-   buildPath(buf, path);
+   buildPath(fd, buf, path);
    printf("%s\n", buf);
    struct stat stat_buf;
    if (lstat(buf, &stat_buf) == -1) {
