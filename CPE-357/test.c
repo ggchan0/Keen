@@ -1,30 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
-int main ()
-{
-   char str1[15];
-   char str2[15];
-   int ret;
-
-
-   strcpy(str1, "ab");
-   strcpy(str2, "cd");
-
-   ret = strcmp(str1, str2);
-
-   if(ret < 0)
-   {
-      printf("str1 is less than str2");
-   }
-   else if(ret > 0) 
-   {
-      printf("str2 is less than str1");
-   }
-   else 
-   {
-      printf("str1 is equal to str2");
-   }
-   
-   return(0);
+int main(void) {
+	char stuff[] = "    here  is a test string";
+	char *token;
+	char *delim = " ";
+	token = strtok(stuff, delim);
+	while (token != NULL) {
+		printf("%s %d\n", token, (int) strlen(token));
+		token = strtok(NULL, delim);
+	}
+	return 0;
 }
