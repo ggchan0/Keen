@@ -16,7 +16,7 @@ int checkHidden(char *arg) {
 
       } else {
          fprintf(stderr, "Invalid flag %c\n", *(arg + i));
-         exit(EXIT_FAILURE);
+         exit(-1);
       }
       i++;
    }
@@ -33,7 +33,7 @@ int checkPerms(char *arg) {
 
       } else {
          fprintf(stderr, "Invalid flag %c\n", *(arg + i));
-         exit(EXIT_FAILURE);
+         exit(-1);
       }
       i++;
    }

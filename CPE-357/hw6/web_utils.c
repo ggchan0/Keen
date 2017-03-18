@@ -8,10 +8,60 @@
 #include <dirent.h>
 #include <ctype.h>
 
-typedef struct Node {
+typedef struct CharNode {
    char *data;
-   struct Node *next;
-} Node;
+   struct CharNode *next;
+} CharNode;
+
+typedef struct Nodelist {
+   struct CharNode *head;
+} Nodelist;
+
+void addToNodelist(Nodelist *nodelist, CharNode *charNode) {
+   if (nodelist->head == NULL) {
+      nodelist->head = charNode;
+   } else {
+      CharNode *temp = nodelist->head;
+      while (temp->next != NULL) {
+         temp = temp->next;
+      }
+      temp->next = charNode;
+   }
+}
+
+CharNode *initializeCharNode(char *data) {
+   CharNode *node = malloc(sizeof(CharNode));
+   if (node == NULL) {
+      fprintf(stderr, "Error trying to malloc for a CharNode\n");
+      exit(EXIT_FAILURE);
+   } else {
+      node->data = data;
+      node->next = NULL;
+   }
+   return node;
+}
+
+Nodelist *initializeNodelist() {
+   Nodelist *list = malloc(sizeof(Nodelist));
+   if (list == NULL) {
+      fprintf(stderr, "Error tring to malloc for a Nodelist\n");
+      exit(EXIT_FAILURE);
+   } else {
+      list->head = NULL;
+   }
+   return list;
+}
+
+void freeNodelist(Nodelist *list) {
+   if (list != NULL) {
+      CharNode *head = list->head;
+      while (head != NULL) {
+         CharNode *temp = head;
+         head = head->next;
+         free(temp);
+      }
+   }
+}
 
 char *doubleSize(char *str, int length) {
    return realloc(str, length);
