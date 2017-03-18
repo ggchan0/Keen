@@ -26,7 +26,7 @@ int create_service(unsigned short port, int queue_size)
    {
       return -1;
    }
-        
+
    local_addr.sin_family = AF_INET;         /* host byte order */
    local_addr.sin_port = htons(port);       /* short, network byte order */
    local_addr.sin_addr.s_addr = INADDR_ANY; /* automatically fill with my IP */

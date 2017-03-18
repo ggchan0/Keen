@@ -10,23 +10,23 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include "simple_net.h"
-#include "web_utils.c"
-
-#define QUEUE_LIMIT 10
-#define KB 1024
+#include "web_utils.h"
 
 void handleSIGCHLD(int signo);
+void handleSIGPIPE(int signo);
 void setup();
+void revertSIGCHLD();
 pid_t checked_fork();
 int get_port(int argc, char **argv);
-int hasReadAccess(struct stat stat_buf);
-void write200Head(int fd, int content_length);
-void throw400Error(int fd);
-void throw403Error(int fd);
-void throw404Error(int fd);
-void throw500Error(int fd);
-void throw501Error(int fd);
 void buildPath(int fd, char *buf, char *path);
+void getFileName(char *buf);
+void cleanUpFile(char *file_name);
+void handleExec(int fd, char *method, char *prog_name, char ** args);
+void getProgram(int fd, char *prog_name, char *arg_string, char *program_line);
+char **getArgs(char *malloced_prog_name, char *arg_string);
+void freeArgs(char **args);
+void CGIWithArgs(int fd, char *method, char *program_line);
+void CGIWithoutArgs(int fd, char *method, char *program_line);
 void executeCGI(int fd, char *method, char *path);
 void executeGet(int fd, char *method, char *path);
 void handleRequest(int fd);
@@ -93,84 +93,6 @@ int get_port(int argc, char **argv) {
    return result;
 }
 
-int hasReadAccess(struct stat stat_buf) {
-   return stat_buf.st_mode & S_IRUSR || \
-   stat_buf.st_mode & S_IRGRP || \
-   stat_buf.st_mode & S_IROTH;
-}
-
-int hasExecAccess(struct stat stat_buf) {
-   return stat_buf.st_mode & S_IXUSR || \
-   stat_buf.st_mode & S_IXGRP || \
-   stat_buf.st_mode & S_IXOTH;
-}
-
-void write200Head(int fd, int content_length) {
-   char buf[KB];
-   buf[0] = 0;
-   snprintf(buf, KB, "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n"
-                     "Content-Length: %d\r\n\r\n", content_length);
-   int length = strlen(buf);
-   write(fd, buf, length);
-}
-
-void throw400Error(int fd) {
-   char *response = "HTTP/1.0 400 Bad Request\r\nContent-Type: text/html\r\n"
-                     "Content-Length: 53\r\n\r\n"
-                     "400 - Request could not be understood by the server.\n";
-   int length = strlen(response);
-   if (write(fd, response, length) < 0) {
-      perror("");
-   }
-   exit(-1);
-}
-
-void throw403Error(int fd) {
-   char *response = "HTTP/1.0 403 Permission Denied\r\n"
-                     "Content-Type: text/html\r\n"
-                     "Content-Length: 50\r\n\r\n"
-                     "403 - Access to the following resource is denied.\n";
-   int length = strlen(response);
-   if (write(fd, response, length) < 0) {
-      perror("");
-   }
-   exit(-1);
-}
-
-void throw404Error(int fd) {
-   char *response = "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\n"
-                     "Content-Length: 26\r\n\r\n"
-                     "404 - Resource not found.\n";
-   int length = strlen(response);
-   if (write(fd, response, length) < 0) {
-      perror("");
-   }
-   exit(-1);
-}
-
-void throw500Error(int fd) {
-   char *response = "HTTP/1.0 500 Internal Error\r\nContent-Type: text/html\r\n"
-                     "Content-Length: 46\r\n\r\n"
-                     "500 - Server encountered an unexpected error.\n";
-   int length = strlen(response);
-   if (write(fd, response, length) < 0) {
-      perror("");
-   }
-   exit(-1);
-}
-
-void throw501Error(int fd) {
-   char *response = "HTTP/1.0 501 Not Implemented\r\n"
-                     "Content-Type: text/html\r\n"
-                     "Content-Length: 33\r\n\r\n"
-                     "501 - HTTP method not supported.\n";
-   int length = strlen(response);
-   if (write(fd, response, length) < 0) {
-      perror("");
-   }
-   exit(-1);
-}
-
 void buildPath(int fd, char *buf, char *path) {
    char *delim = "/";
    char *token = strtok(path, delim);
@@ -199,6 +121,7 @@ void cleanUpFile(char *file_name) {
    strcat(command, "rm ");
    strcat(command, file_name);
    system(command);
+   free(command);
 }
 
 void getProgram(int fd, char *prog_name, char *arg_string, char *program_line) {
@@ -234,6 +157,7 @@ char **getArgs(char *malloced_prog_name, char *arg_string) {
    args[0] = malloced_prog_name;
    args[i] = NULL;
    freeNodelist(list);
+   free(list);
    return args;
 }
 
@@ -249,16 +173,17 @@ void handleExec(int fd, char *method, char *prog_name, char ** args) {
    pid_t pid;
    char buf[KB];
    char file_name[KB];
-   int bytes_read, output_fd, status;
+   int bytes_read = 0, output_fd, status = 0;
    struct stat stat_buf;
    getFileName(file_name);
    pid = fork();
    if (pid == 0) {
       output_fd = open(file_name, O_WRONLY | O_CREAT,
                         S_IRUSR | S_IXUSR | S_IWUSR);
-      close(1);
+      /*close(1);
       dup(output_fd);
-      close(output_fd);
+      close(output_fd);*/
+      dup2(output_fd, 1);
       if (execv(prog_name, args) == -1) {
          throw500Error(fd);
       }
@@ -377,7 +302,7 @@ void handleRequest(int fd) {
    if (!isValidMethod(method)) {
       throw501Error(fd);
    }
-   if (strstr(path, "cgi-like") != NULL) {
+   if (strstr(path, "/cgi-like") != NULL) {
       mode = 1;
    }
    if (mode) {
