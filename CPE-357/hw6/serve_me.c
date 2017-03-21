@@ -29,7 +29,7 @@ void CGIWithArgs(int fd, char *method, char *program_line);
 void CGIWithoutArgs(int fd, char *method, char *program_line);
 void executeCGI(int fd, char *method, char *path);
 void executeGet(int fd, char *method, char *path);
-void handleRequest(int fd);
+void handleRequest(int connection_fd, int fd);
 
 void handleSIGCHLD(int signo) {
    waitpid(-1, NULL, WNOHANG);
@@ -180,10 +180,9 @@ void handleExec(int fd, char *method, char *prog_name, char ** args) {
    if (pid == 0) {
       output_fd = open(file_name, O_WRONLY | O_CREAT,
                         S_IRUSR | S_IXUSR | S_IWUSR);
-      /*close(1);
-      dup(output_fd);
-      close(output_fd);*/
       dup2(output_fd, 1);
+      dup2(output_fd, 2);
+      close(output_fd);
       if (execv(prog_name, args) == -1) {
          throw500Error(fd);
       }
@@ -282,8 +281,8 @@ void executeGet(int fd, char *method, char *path) {
    }
 }
 
-void handleRequest(int fd) {
-   FILE *request = fdopen(fd, "r");
+void handleRequest(int connection_fd, int fd) {
+   FILE *request = fdopen(connection_fd, "r");
    char *line = readline(request);
    char *method, *path, *HTTP;
    int mode = 0;
@@ -306,11 +305,12 @@ void handleRequest(int fd) {
       mode = 1;
    }
    if (mode) {
-      executeCGI(fd, method, path);
+      executeCGI(connection_fd, method, path);
    } else {
-      executeGet(fd, method, path);
+      executeGet(connection_fd, method, path);
    }
    fclose(request);
+   close(connection_fd);
    close(fd);
    free(line);
    exit(0);
@@ -324,7 +324,7 @@ int main(int argc, char **argv) {
       int connection_fd = accept_connection(fd);
       pid_t pid = checked_fork();
       if (pid == 0) {
-         handleRequest(connection_fd);
+         handleRequest(connection_fd, fd);
       }
       close(connection_fd);
    }
